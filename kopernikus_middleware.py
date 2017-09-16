@@ -4,9 +4,8 @@ import serial
 import pygame
 import time
 import struct
-
-
-
+import pygame.display
+import os
 
 def get_image(num=1, onboard=False, all_cam=False):
     # Start the video feed from USB camera
@@ -18,7 +17,7 @@ def get_image(num=1, onboard=False, all_cam=False):
         return cap, cap_onboard
     elif onboard:
         cap_onboard = cv2.VideoCapture("nvcamerasrc ! video/x-raw(memory:NVMM), width=(int)1280, height=(int)720,format=(string)I420, framerate=(fraction)30/1 ! nvvidconv flip-method=0 ! video/x-raw, format=(string)BGRx ! videoconvert ! video/x-raw, format=(string)BGR ! appsink")
-        return cap_onboard
+	return cap_onboard
     else:
         cap = cv2.VideoCapture(num)
         return cap
@@ -45,14 +44,16 @@ def drive_actuator(ser, commands, j):
 def init_remote():
     # initiate pygame
     pygame.init()
+    os.putenv('DISPLAY',':0.0')
+    pygame.display.init()
+
     j = pygame.joystick.Joystick(0)
     j.init()
     return j
 
 def drive_remote(ser, j):
 
-    pygame.event.pump()
-
+    	pygame.event.pump()
 	thr = int(j.get_axis(1)*(-50) + 50)
 	ster = abs(int(j.get_axis(2)*50 + 50))
 	ser.write(b't')
@@ -61,6 +62,7 @@ def drive_remote(ser, j):
 	time.sleep(0.011)
 	ser.write(struct.pack('>B', ster))
 	time.sleep(0.011)
+
 	#return data
-	#print (thr, ster)
+	print (thr, ster)
 	return [j.get_axis(1), j.get_axis(2)]

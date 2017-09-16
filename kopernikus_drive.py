@@ -3,7 +3,7 @@ import numpy as np
 import random
 
 # usb camera
-cam = get_image(num=1, onboard=False, all_cam=False)
+cam = get_image(num=1, onboard=True, all_cam=False)
 # initiate serial communication
 motors = init_actuator()
 # initiate joystick
@@ -35,3 +35,4 @@ while(True):
 	commands = model.run(frame)
 	# Drive motors
 	drive_actuator(motors, commands, remote)
+  
