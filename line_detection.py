@@ -1,5 +1,8 @@
 import cv2
 import numpy as np
+import time
+from lane_detection_with_decision_making import decide_turn
+import math
 
 # image is expected be in RGB color space
 def select_rgb_white(image): 
@@ -131,7 +134,7 @@ def draw_lane_lines(image, lines, color=[255, 0, 0], thickness=20):
 lane_images = []
 
 # img = cv2.imread('data/color2.png')
-cap = cv2.VideoCapture('1505593738.06-output.avi')
+cap = cv2.VideoCapture('data/1505593738.06-output.avi')
 while(True):
 	# Capture frame-by-frame
 	ret, frame = cap.read()
@@ -179,13 +182,19 @@ while(True):
 	hough = cv2.HoughLinesP(region, rho=1, theta=np.pi/180, threshold=20, minLineLength=20, maxLineGap=300)
 	lanes = lane_lines(img, hough)
 	# print(lanes)
+	angle = decide_turn(img, lanes, 0.01, 30)
+	# print(angle)
 	img = draw_lane_lines(img, lanes)
+	angle *= np.pi/2
+	print(math.sin(angle))
+	cv2.line(img, (int(img.shape[1]/2), int(img.shape[0]*0.95)), (int(img.shape[1]/2 + math.sin(angle)*90), int(img.shape[0]*0.95)), [0, 0, 255])
 	cv2.imshow('image', img)
 	# cv2.waitKey(0)
 
 	# cv2.destroyAllWindows()
 	if cv2.waitKey(1) & 0xFF == ord('q'):
 		break
+	time.sleep(0.01)
 # When everything done, release the capture
 cap.release()
 cv2.destroyAllWindows()

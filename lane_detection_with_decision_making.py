@@ -130,7 +130,7 @@ def draw_lane_lines(image, lines, color=[255, 0, 0], thickness=20):
     return image
 
 
-def decide_turn(img, lines, min_slope, max_slope, color=[255, 0, 0], thickness=11):
+def decide_turn(img, lines, min_slope, max_slope, angle=1, color=[255, 0, 0], thickness=11):
 
     """
 
@@ -166,19 +166,19 @@ def decide_turn(img, lines, min_slope, max_slope, color=[255, 0, 0], thickness=1
 
     if lines[0] == None: #left is none
         if lines[1] == None: # right is none
-            return 'no decision'
+            return 0
         else:
             right = sum(lines[1], ())
             r_slope = ((right[3]-right[1])/(right[2]-right[0]))
             r_coeff = right[1]-r_slope*right[0]
-            print(r_slope)
-            return 'left'
+            # print(r_slope)
+            return -angle
     elif lines[1] == None: #right is none
         left = sum(lines[0], ())
         l_slope = ((left[3]-left[1])/(left[2]-left[0]))
         l_coeff = left[1]-l_slope*left[0]
-        print(l_slope)
-        return 'right'
+        # print(l_slope)
+        return angle
 
     # if we reach here, both slope-sets exist!  
 
@@ -204,9 +204,9 @@ def decide_turn(img, lines, min_slope, max_slope, color=[255, 0, 0], thickness=1
     r_slope = ((right[3]-right[1])/(right[2]-right[0]))
     r_coeff = right[1]-r_slope*right[0]
 
-    print(l_slope)
+    # print(l_slope)
     #print(l_coeff)
-    print(r_slope)
+    # print(r_slope)
     #print(r_coeff)
 
 
@@ -226,76 +226,76 @@ def decide_turn(img, lines, min_slope, max_slope, color=[255, 0, 0], thickness=1
     #calculate x intercept of two lines
     x_intercept = (r_coeff - l_coeff) / (l_slope - r_slope)  
 
-    if x_intercept > x_middle:
-        return 'right'
-    else:
-        return 'left'
+    angle = x_intercept - x_middle
+
+    return angle / img.shape[0] # * threshold
+
 
 
              
     
-lane_images = []
+# lane_images = []
 
-# img = cv2.imread('data/color2.png')
-cap = cv2.VideoCapture('data/1505593738.06-output.avi')
-while(True):
-	# Capture frame-by-frame
-	ret, frame = cap.read()
+# # img = cv2.imread('data/color2.png')
+# cap = cv2.VideoCapture('data/1505593738.06-output.avi')
+# while(True):
+# 	# Capture frame-by-frame
+# 	ret, frame = cap.read()
 
-	if (not ret):
-		break
+# 	if (not ret):
+# 		break
 
-	# Display the resulting frame
-	img = frame
-	# print(img.shape)
-	# print(np.max(img))
-	# print(np.min(img))
+# 	# Display the resulting frame
+# 	img = frame
+# 	# print(img.shape)
+# 	# print(np.max(img))
+# 	# print(np.min(img))
 
-	# masked = select_rgb_white(img)
-	# cv2.imshow('image', masked)
-	# cv2.waitKey(0)
+# 	# masked = select_rgb_white(img)
+# 	# cv2.imshow('image', masked)
+# 	# cv2.waitKey(0)
 
-	# hsv = cv2.cvtColor(img, cv2.COLOR_RGB2HSV)
-	# cv2.imshow('image', hsv)
-	# cv2.waitKey(0)
+# 	# hsv = cv2.cvtColor(img, cv2.COLOR_RGB2HSV)
+# 	# cv2.imshow('image', hsv)
+# 	# cv2.waitKey(0)
 
-	# hls = select_hls(img)
-	# cv2.imshow('image', hls)
-	# cv2.waitKey(0)
+# 	# hls = select_hls(img)
+# 	# cv2.imshow('image', hls)
+# 	# cv2.waitKey(0)
 
-	gray = cv2.cvtColor(img, cv2.COLOR_RGB2GRAY)
-	#kernel_size must be postivie and odd
-	kernel_size = 15
-	blurred = cv2.GaussianBlur(gray, (kernel_size, kernel_size), 0)
-	#Recommended a upper:lower ratio between 2:1 and 3:1
-	low_threshold=50
-	high_threshold=150
-	canny = cv2.Canny(blurred, low_threshold, high_threshold)
-	# cv2.imshow('image', canny)
-	# cv2.waitKey(0)
+# 	gray = cv2.cvtColor(img, cv2.COLOR_RGB2GRAY)
+# 	#kernel_size must be postivie and odd
+# 	kernel_size = 15
+# 	blurred = cv2.GaussianBlur(gray, (kernel_size, kernel_size), 0)
+# 	#Recommended a upper:lower ratio between 2:1 and 3:1
+# 	low_threshold=50
+# 	high_threshold=150
+# 	canny = cv2.Canny(blurred, low_threshold, high_threshold)
+# 	# cv2.imshow('image', canny)
+# 	# cv2.waitKey(0)
 
-	# region = select_region(img)
-	# cv2.imshow('image', region)
-	# cv2.waitKey(0)
+# 	# region = select_region(img)
+# 	# cv2.imshow('image', region)
+# 	# cv2.waitKey(0)
 
-	region = select_region(canny)
-	# cv2.imshow('image', region)
-	# cv2.waitKey(0)
+# 	region = select_region(canny)
+# 	# cv2.imshow('image', region)
+# 	# cv2.waitKey(0)
 
-	hough = cv2.HoughLinesP(region, rho=1, theta=np.pi/180, threshold=20, minLineLength=20, maxLineGap=300)
-	lanes = lane_lines(img, hough)
+# 	hough = cv2.HoughLinesP(region, rho=1, theta=np.pi/180, threshold=20, minLineLength=20, maxLineGap=300)
+# 	lanes = lane_lines(img, hough)
 
-	decision = decide_turn(img, lanes, 0.01, 30)
-	print(decision)
+# 	decision = decide_turn(img, lanes, 0.01, 30)
+# 	print(decision)
 
-	# print(lanes)
-	img = draw_lane_lines(img, lanes)
-	cv2.imshow('image', img)
-	# cv2.waitKey(0)
+# 	# print(lanes)
+# 	img = draw_lane_lines(img, lanes)
+# 	cv2.imshow('image', img)
+# 	# cv2.waitKey(0)
 
-	# cv2.destroyAllWindows()
-	if cv2.waitKey(1) & 0xFF == ord('q'):
-		break
-# When everything done, release the capture
-cap.release()
-cv2.destroyAllWindows()
+# 	# cv2.destroyAllWindows()
+# 	if cv2.waitKey(1) & 0xFF == ord('q'):
+# 		break
+# # When everything done, release the capture
+# cap.release()
+# cv2.destroyAllWindows()
