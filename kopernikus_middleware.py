@@ -13,10 +13,10 @@ def get_image(num=1, onboard=False, all_cam=False):
     if onboard and all_cam:
         # Start video feed from onboard camera
         cap = cv2.VideoCapture(num)
-        cap_onboard = cv2.VideoCapture("nvcamerasrc ! video/x-raw(memory:NVMM), width=(int)1280, height=(int)720,format=(string)I420, framerate=(fraction)30/1 ! nvvidconv flip-method=0 ! video/x-raw, format=(string)BGRx ! videoconvert ! video/x-raw, format=(string)BGR ! appsink")
+        cap_onboard = cv2.VideoCapture("nvcamerasrc ! video/x-raw(memory:NVMM), width=640, height=480,format=(string)I420, framerate=(fraction)30/1 ! nvvidconv flip-method=0 ! video/x-raw, format=(string)BGRx ! videoconvert ! video/x-raw, format=(string)BGR ! appsink")
         return cap, cap_onboard
     elif onboard:
-        cap_onboard = cv2.VideoCapture("nvcamerasrc ! video/x-raw(memory:NVMM), width=(int)1280, height=(int)720,format=(string)I420, framerate=(fraction)30/1 ! nvvidconv flip-method=0 ! video/x-raw, format=(string)BGRx ! videoconvert ! video/x-raw, format=(string)BGR ! appsink")
+        cap_onboard = cv2.VideoCapture("nvcamerasrc ! video/x-raw(memory:NVMM), width=640, height=480,format=(string)I420, framerate=(fraction)30/1 ! nvvidconv flip-method=0 ! video/x-raw, format=(string)BGRx ! videoconvert ! video/x-raw, format=(string)BGR ! appsink")
 	return cap_onboard
     else:
         cap = cv2.VideoCapture(num)
@@ -62,7 +62,6 @@ def drive_remote(ser, j):
 	time.sleep(0.011)
 	ser.write(struct.pack('>B', ster))
 	time.sleep(0.011)
-
 	#return data
 	print (thr, ster)
 	return [j.get_axis(1), j.get_axis(2)]
