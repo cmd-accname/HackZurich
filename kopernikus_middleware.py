@@ -17,29 +17,35 @@ def get_image(num=1, onboard=False, all_cam=False):
         return cap, cap_onboard
     elif onboard:
         cap_onboard = cv2.VideoCapture("nvcamerasrc ! video/x-raw(memory:NVMM), width=640, height=480,format=(string)I420, framerate=(fraction)30/1 ! nvvidconv flip-method=0 ! video/x-raw, format=(string)BGRx ! videoconvert ! video/x-raw, format=(string)BGR ! appsink")
-	return cap_onboard
+        return cap_onboard
+    elif isinstance(num, basestring):
+        # num is the str with the media file
+        cap = cv2.VideoCapture(num)
+        return cap
     else:
         cap = cv2.VideoCapture(num)
         return cap
+
 
 def init_actuator():
     # Open Serial Connection to Arduino Board
     ser = serial.Serial('/dev/ttyACM0', 9600)
     return ser
 
+
 def drive_actuator(ser, commands, j):
-	thr = int(commands[0]*50 + 50)
-	ster = abs(int(commands[1]*50 + 50))
-	pygame.event.pump()
-	# deadman switch for safety
-	if j.get_button(4):
-		ser.write(b't')
-		time.sleep(0.011)
-		ser.write(struct.pack('>B', thr))
-		time.sleep(0.011)
-		ser.write(struct.pack('>B', ster))
-		time.sleep(0.011)
-		print(thr, ster)
+    thr = int(commands[0]*50 + 50)
+    ster = abs(int(commands[1]*50 + 50))
+    pygame.event.pump()
+    # deadman switch for safety
+    if j.get_button(4):
+        ser.write(b't')
+        time.sleep(0.011)
+        ser.write(struct.pack('>B', thr))
+        time.sleep(0.011)
+        ser.write(struct.pack('>B', ster))
+        time.sleep(0.011)
+        print(thr, ster)
 
 def init_remote():
     # initiate pygame
@@ -51,17 +57,17 @@ def init_remote():
     j.init()
     return j
 
-def drive_remote(ser, j):
 
-    	pygame.event.pump()
-	thr = int(j.get_axis(1)*(-50) + 50)
-	ster = abs(int(j.get_axis(2)*50 + 50))
-	ser.write(b't')
-	time.sleep(0.011)
-	ser.write(struct.pack('>B', thr))
-	time.sleep(0.011)
-	ser.write(struct.pack('>B', ster))
-	time.sleep(0.011)
-	#return data
-	print (thr, ster)
-	return [j.get_axis(1), j.get_axis(2)]
+def drive_remote(ser, j):
+    pygame.event.pump()
+    thr = int(j.get_axis(1)*(-50) + 50)
+    ster = abs(int(j.get_axis(2)*50 + 50))
+    ser.write(b't')
+    time.sleep(0.011)
+    ser.write(struct.pack('>B', thr))
+    time.sleep(0.011)
+    ser.write(struct.pack('>B', ster))
+    time.sleep(0.011)
+    # return data
+    print (thr, ster)
+    return [j.get_axis(1), j.get_axis(2)]
