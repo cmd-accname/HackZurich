@@ -5,7 +5,7 @@ import csv
 plugged = False
 
 #usb_cam, onboard_cam = get_image()
-cam = get_image(num=1, onboard=True, all_cam=False)
+cam = get_image(num=1, onboard=False, all_cam=False)
 # cam.set(cv2.CAP_PROP_FRAME_WIDTH, 640.0)
 # cam.set(cv2.CAP_PROP_FRAME_HEIGHT, 480.0)
 if plugged:
