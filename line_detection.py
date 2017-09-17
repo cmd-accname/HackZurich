@@ -186,8 +186,9 @@ while(True):
 	# print(angle)
 	img = draw_lane_lines(img, lanes)
 	angle *= np.pi/2
-	print(math.sin(angle))
-	cv2.line(img, (int(img.shape[1]/2), int(img.shape[0]*0.95)), (int(img.shape[1]/2 + math.sin(angle)*90), int(img.shape[0]*0.95)), [0, 0, 255])
+	x = math.sin(angle)*90
+	y = math.cos(angle)*90
+	cv2.line(img, (int(img.shape[1]/2), int(img.shape[0]*0.95)), (int(img.shape[1]/2 + x), int(img.shape[0]*0.95-y)), [0, 0, 255])
 	cv2.imshow('image', img)
 	# cv2.waitKey(0)
 
